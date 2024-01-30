@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Models\AdministracionModulos;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class SiadiInscripcion extends Model
+{
+    use HasFactory;
+    protected $primaryKey = 'id_inscripcion';
+    protected $fillable = [
+        
+        
+        'id_siadi_persona',
+        'id_planificar_asignatura',
+        'tipo_pago_inscripcion',
+        'fecha_inscripcion',
+        'observacion_inscripcion',
+        'estado_inscripcion',
+        'monto_deposito',
+        'id_usuario',
+        'nro_deposito',
+       
+        
+    ];
+    public function siadi_persona(){
+        return $this->belongsTo(SiadiPersona::class, 'id_siadi_persona');
+    }
+    public function planificar_asignatura(){
+        return $this->belongsTo(SiadiPlanificarAsignatura::class, 'id_planificar_asignatura');
+    }
+    public function planificar_paralelo(){
+        return $this->belongsTo(SiadiPlanificarParalelo::class, 'id_planificar_paralelo');
+    }
+     public function inscripcion_paralelo(){
+        return $this->hasMany(SiadiPlanificarParalelo::class, 'id_planificar_paralelo');
+    }
+     public function notas(){
+        return $this->hasOne(SiadiNota::class, 'id_inscripcion');
+    }
+
+}
