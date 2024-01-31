@@ -163,12 +163,14 @@
 
                     <div class="mb-3 row">
                         <div class="col-md-6 p-3">
-                            <button class="btn btn-success"  wire:click="agregar_persona">AGREGAR PERSONA</button> {{-- data-bs-toggle="modal" data-bs-target="#crearpersona" --}}
+                            <button class="btn btn-success" wire:click="agregar_persona">AGREGAR PERSONA</button>
+                            {{-- data-bs-toggle="modal" data-bs-target="#crearpersona" --}}
                         </div>
 
                         <div class="col-md-6 p-3">
                             <div class="input-group">
-                                <input type="text" class="form-control" wire:model="search" placeholder="Buscador por C.I.">
+                                <input type="text" class="form-control" wire:model="search"
+                                    placeholder="Buscador por C.I.">
                                 <button class="btn btn-outline-secondary">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -181,7 +183,8 @@
 
                     @if ($personas->count())
                         <div class="table-responsive">
-                            <table  id="datatable" class="table table-bordered dt-responsive nowrap mb-100" style="border-collapse: collapse; border-spacing: 0; width: 100%; ">
+                            <table id="datatable" class="table table-bordered dt-responsive nowrap mb-100"
+                                style="border-collapse: collapse; border-spacing: 0; width: 100%; ">
                                 <thead>
                                     <tr>
 
@@ -214,7 +217,7 @@
                                         <th>
                                             DIRECCION
                                         </th> --}}
-                                        
+
                                         <th>
                                             TELÉFONO
                                         </th>
@@ -273,7 +276,7 @@
                                             </td>
                                             <td>
                                                 {{ $persona->direccion_persona }}
-                                            </td> --}} 
+                                            </td> --}}
                                             <td>
                                                 {{ $persona->telefono_persona }}
                                             </td>
@@ -286,57 +289,74 @@
 
 
                                             <td>
-                                            
 
-                                            <div class="dropdown">
-                                                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">Acciones <i class="mdi mdi-chevron-down"></i>
-                                                </button>
-                                                
-                                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                                
-                                                    <a wire:click="verhistorial({{ $persona->id_siadi_persona }})" class="dropdown-item " href="javascript:void(0)">HISTORIAL</a>
-                                                    <a wire:click="imprimir_record({{ $persona->id_siadi_persona }})" class="dropdown-item " href="javascript:void(0)">RECORD ACADEMICO</a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a wire:click="inscribirestudiante({{ $persona->id_siadi_persona }})" class="dropdown-item" href="javascript:void(0)">INSCRIBIR</a>
-                                                    <a href="{{route('imprimir_boleta',$persona->id_siadi_persona )}}" class="dropdown-item" >BOLETA DE INSCRIPCIÓN</a>
-                                                    @php
-                                                        # verifica que al menos una asignatura este aprobada, para poder mostrar
-                                                        $estado_certificado_notas = false;
-                                                        if (count($persona->persona_inscrita) > 0) {
-                                                            foreach ($persona->persona_inscrita as $inds) {
-                                                                if ($inds->notas->final_nota >= 51) {
-                                                                    $estado_certificado_notas = true;
-                                                                    break;
+
+                                                <div class="dropdown">
+                                                    <button class="btn btn-info dropdown-toggle" type="button"
+                                                        id="dropdownMenuButton" data-bs-toggle="dropdown"
+                                                        aria-haspopup="true" aria-expanded="false">Acciones <i
+                                                            class="mdi mdi-chevron-down"></i>
+                                                    </button>
+
+                                                    <div class="dropdown-menu dropdown-menu-end"
+                                                        aria-labelledby="dropdownMenuButton">
+
+                                                        <a wire:click="verhistorial({{ $persona->id_siadi_persona }})"
+                                                            class="dropdown-item "
+                                                            href="javascript:void(0)">HISTORIAL</a>
+                                                        <a wire:click="imprimir_record({{ $persona->id_siadi_persona }})"
+                                                            class="dropdown-item " href="javascript:void(0)">RECORD
+                                                            ACADEMICO</a>
+                                                        <div class="dropdown-divider"></div>
+                                                        <a wire:click="inscribirestudiante({{ $persona->id_siadi_persona }})"
+                                                            class="dropdown-item"
+                                                            href="javascript:void(0)">INSCRIBIR</a>
+                                                        <a href="{{ route('imprimir_boleta', $persona->id_siadi_persona) }}"
+                                                            class="dropdown-item">BOLETA DE INSCRIPCIÓN</a>
+                                                        @php
+                                                            # verifica que al menos una asignatura este aprobada, para poder mostrar
+                                                            $estado_certificado_notas = false;
+                                                            if (count($persona->persona_inscrita) > 0) {
+                                                                foreach ($persona->persona_inscrita as $inds) {
+                                                                    if ($inds->notas->final_nota >= 51) {
+                                                                        $estado_certificado_notas = true;
+                                                                        break;
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    @endphp
-                                                    @if ($estado_certificado_notas)
-                                                        <a href="{{ route('reporte_pdf_certificado_notas', ['id_persona' => $persona->id_siadi_persona]) }}" target="_blank" class="dropdown-item">CERTIFICADO DE NOTAS</a>
-                                                    @endif
-                                                    <a href="{{ route('formulariopreinscripcion', $persona->id_siadi_persona) }}" target="_blank" class="dropdown-item" href="javascript:void(0)">FORMULARIO DE PREINCRIPCION</a>
-
-                                                    @foreach ($persona->persona_inscrita as $insc)
-                                                        @if ($insc->notas && $insc->notas->certificados && $insc->notas->certificados->certificado_id != null)
-                                                            @php
-                                                                $formato_impresion = 'formato1';
-                                                                $carga_horaria = true;
-                                                            @endphp
-                                                                <a target="_blank" class="dropdown-item" href="{{ route('impresion_certificado', ['id_certificado' => $insc->notas->certificados->certificado_id,'formato_impresion' => $formato_impresion,'carga_horaria' => $carga_horaria,]) }}">
-                                                                IMPRIMIR CERTIFICADO
-                                                                {{ $insc->planificar_asignatura->siadi_asignatura->idioma->nombre_idioma }}
-                                                                {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma }}
-                                                            </a>
+                                                        @endphp
+                                                        @if ($estado_certificado_notas)
+                                                            <a href="{{ route('reporte_pdf_certificado_notas', ['id_persona' => $persona->id_siadi_persona]) }}"
+                                                                target="_blank" class="dropdown-item">CERTIFICADO DE
+                                                                NOTAS</a>
                                                         @endif
-                                                    @endforeach                                                                                                
-                                                    <div class="dropdown-divider"></div>
-                                                    <a wire:click="editar_persona({{ $persona->id_siadi_persona }})" class="dropdown-item" href="javascript:void(0)">EDITAR PERSONA</a>
+                                                        <a href="{{ route('formulariopreinscripcion', $persona->id_siadi_persona) }}"
+                                                            target="_blank" class="dropdown-item"
+                                                            href="javascript:void(0)">FORMULARIO DE PREINCRIPCION</a>
+
+                                                        @foreach ($persona->persona_inscrita as $insc)
+                                                            @if ($insc->notas && $insc->notas->certificados && $insc->notas->certificados->certificado_id != null)
+                                                                @php
+                                                                    $formato_impresion = 'formato1';
+                                                                    $carga_horaria = true;
+                                                                @endphp
+                                                                <a target="_blank" class="dropdown-item"
+                                                                    href="{{ route('impresion_certificado', ['id_certificado' => $insc->notas->certificados->certificado_id, 'formato_impresion' => $formato_impresion, 'carga_horaria' => $carga_horaria]) }}">
+                                                                    IMPRIMIR CERTIFICADO
+                                                                    {{ $insc->planificar_asignatura->siadi_asignatura->idioma->nombre_idioma }}
+                                                                    {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma }}
+                                                                </a>
+                                                            @endif
+                                                        @endforeach
+                                                        <div class="dropdown-divider"></div>
+                                                        <a wire:click="editar_persona({{ $persona->id_siadi_persona }})"
+                                                            class="dropdown-item" href="javascript:void(0)">EDITAR
+                                                            PERSONA</a>
+                                                    </div>
                                                 </div>
-                                            </div>
 
 
-                                                
+
                                                 {{-- 
                                                     <button type="button"
                                                         class="btn btn-outline-success waves-effect waves-light"
@@ -354,7 +374,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         <div class="d-flex justify-content-center">
 
                             {{ $personas->links() }}
@@ -403,7 +423,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">EXPEDIDO:</label>
-                                        <select class="form-select @error('expedido_edit') border-danger @enderror" wire:model="expedido_edit">
+                                        <select class="form-select @error('expedido_edit') border-danger @enderror"
+                                            wire:model="expedido_edit">
                                             <option value="">Elegir...</option>
                                             @foreach ($EXPEDIDO_DATA as $expedi)
                                                 <option value="{{ $expedi }}">{{ $expedi }}
@@ -419,7 +440,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">ESTADO CIVIL:</label>
-                                        <select class="form-select @error('estado_civil_edit') border-danger @enderror" wire:model="estado_civil_edit">
+                                        <select class="form-select @error('estado_civil_edit') border-danger @enderror"
+                                            wire:model="estado_civil_edit">
                                             <option value="">Elegir...</option>
                                             @foreach ($ESTADOS_CIVILES as $est_civ)
                                                 <option value="{{ $est_civ }}">{{ $est_civ }}
@@ -444,7 +466,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-6">
-                                        <label class="form-label  @error('paterno_edit') border-danger @enderror">PATERNO:</label>
+                                        <label
+                                            class="form-label  @error('paterno_edit') border-danger @enderror">PATERNO:</label>
                                         <input type="text" class="form-control" wire:model="paterno_edit">
                                         @error('paterno_edit')
                                             <span class="text-danger">{{ $message }}</span>
@@ -455,7 +478,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">MATERNO:</label>
-                                        <input type="text" class="form-control @error('materno_edit') border-danger @enderror" wire:model="materno_edit">
+                                        <input type="text"
+                                            class="form-control @error('materno_edit') border-danger @enderror"
+                                            wire:model="materno_edit">
                                         @error('materno_edit')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -465,7 +490,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">PAÍS:</label>
-                                        <select class="form-select @error('pais_edit') border-danger @enderror" wire:model="pais_edit">
+                                        <select class="form-select @error('pais_edit') border-danger @enderror"
+                                            wire:model="pais_edit">
                                             <option value="">Elegir...</option>
                                             @foreach ($paises as $pa)
                                                 <option value="{{ $pa->id_siadi_pais }}">{{ $pa->nombre_siadi_pais }}
@@ -484,7 +510,8 @@
                                     <div class="mb-6">
                                         <label class="form-label">GÉNERO:</label>
 
-                                        <select class="form-select @error('genero_edit') border-danger @enderror" wire:model="genero_edit">
+                                        <select class="form-select @error('genero_edit') border-danger @enderror"
+                                            wire:model="genero_edit">
                                             <option value="M">MASCULINO</option>
                                             <option value="F">FEMENINO</option>
                                         </select>
@@ -497,7 +524,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">FECHA DE NACIMIENTO:</label>
-                                        <input type="date" class="form-control @error('fecha_nacimiento_edit') border-danger @enderror"
+                                        <input type="date"
+                                            class="form-control @error('fecha_nacimiento_edit') border-danger @enderror"
                                             wire:model="fecha_nacimiento_edit">
                                         @error('fecha_nacimiento_edit')
                                             <span class="text-danger">{{ $message }}</span>
@@ -509,7 +537,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">PROFESIÓN:</label>
-                                        <input type="text" class="form-control @error('profesion_edit') border-danger @enderror" wire:model="profesion_edit">
+                                        <input type="text"
+                                            class="form-control @error('profesion_edit') border-danger @enderror"
+                                            wire:model="profesion_edit">
                                         @error('profesion_edit')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -598,17 +628,19 @@
 
             </div>
 
-        @if ($inscripciones->count())
-            <div wire:ignore.self data-bs-backdrop="static" id="historialpersona" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title mt-0" id="myModalLabel"> HISTORIAL ACADEMICO </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                 
+            @if ($inscripciones->count())
+                <div wire:ignore.self data-bs-backdrop="static" id="historialpersona" class="modal fade"
+                    tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0" id="myModalLabel"> HISTORIAL ACADEMICO </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+
                                     <div class="table-responsive">
                                         <table class=" table table-hover mb-0">
 
@@ -629,114 +661,172 @@
                                                     <tr>
 
                                                         <td align="center">
-                                                        @if ($insc->planificar_asignatura->siadi_convocatoria->nro_libro)
-                                                            <span class="badge bg-secondary" style="font-size:12px;"><b>Libro:{{$insc->planificar_asignatura->siadi_convocatoria->nro_libro}}</b></span><hr class="p-0 mt-0 mb-0">
-                                                        @endif
-                                                            <span class="badge bg-info">{{$insc->planificar_asignatura->siadi_convocatoria->periodo}}/{{$insc->planificar_asignatura->siadi_convocatoria->gestion->nombre_gestion}}
-                                                            {{$insc->planificar_asignatura->siadi_convocatoria->siadi_sede->sede_upea->nombre}}</br>
-                                                            <span class="badge bg-success">{{$insc->planificar_asignatura->siadi_convocatoria->siadi_sede->direccion}}</span></span>
+                                                            @if ($insc->planificar_asignatura->siadi_convocatoria->nro_libro)
+                                                                <span class="badge bg-secondary"
+                                                                    style="font-size:12px;"><b>Libro:{{ $insc->planificar_asignatura->siadi_convocatoria->nro_libro }}</b></span>
+                                                                <hr class="p-0 mt-0 mb-0">
+                                                            @endif
+                                                            <span
+                                                                class="badge bg-info">{{ $insc->planificar_asignatura->siadi_convocatoria->periodo }}/{{ $insc->planificar_asignatura->siadi_convocatoria->gestion->nombre_gestion }}
+                                                                {{ $insc->planificar_asignatura->siadi_convocatoria->siadi_sede->sede_upea->nombre }}</br>
+                                                                <span
+                                                                    class="badge bg-success">{{ $insc->planificar_asignatura->siadi_convocatoria->siadi_sede->direccion }}</span></span>
                                                         </td>
-                                                        <td> 
-                                                            <strong>{{$insc->planificar_asignatura->siadi_paralelo->nombre_paralelo}} - {{$insc->planificar_asignatura->turno_paralelo}}</strong>
+                                                        <td>
+                                                            <strong>{{ $insc->planificar_asignatura->siadi_paralelo->nombre_paralelo }}
+                                                                -
+                                                                {{ $insc->planificar_asignatura->turno_paralelo }}</strong>
                                                         </td>
-                                                        <td> 
-                                                        <span class="badge bg-success">{{ $insc->planificar_asignatura->siadi_asignatura->idioma->sigla_codigo_idioma }}</br><span class="badge bg-info" style="font-size:11px;">{{ $insc->planificar_asignatura->siadi_asignatura->idioma->nombre_idioma }} {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->descripcion_nivel_idioma }} {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma }}</span></span>
+                                                        <td>
+                                                            <span
+                                                                class="badge bg-success">{{ $insc->planificar_asignatura->siadi_asignatura->idioma->sigla_codigo_idioma }}</br><span
+                                                                    class="badge bg-info"
+                                                                    style="font-size:11px;">{{ $insc->planificar_asignatura->siadi_asignatura->idioma->nombre_idioma }}
+                                                                    {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->descripcion_nivel_idioma }}
+                                                                    {{ $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma }}</span></span>
                                                         </td>
-                                                        <td> {{ $insc->planificar_asignatura->siadi_asignatura->idioma->tipo_idioma  }} </td>
-                                                        <td > 
-                                                            
+                                                        <td> {{ $insc->planificar_asignatura->siadi_asignatura->idioma->tipo_idioma }}
+                                                        </td>
+                                                        <td>
+
                                                             @if ($editingNotaId === $insc->id_inscripcion)
-                                                                <input wire:model="editedNota" type="text" class="form-control">
+                                                                <input wire:model="editedNota" type="text"
+                                                                    class="form-control">
                                                                 @error('editedNota')
                                                                     <span class="text-danger">{{ $message }}</span>
                                                                 @enderror
-                                                            @elseif(!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota==$insc->notas->id_nota)
-                                                                <span title="Nota Anterior">{{$insc->notas->final_nota}}</span>
+                                                            @elseif(!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota == $insc->notas->id_nota)
+                                                                <span
+                                                                    title="Nota Anterior">{{ $insc->notas->final_nota }}</span>
                                                                 <hr>
-                                                                <span class="text-info" title="Nueva Nota Final"><b>{{$nota_final_baja}}</b></span> <br>
+                                                                <span class="text-info"
+                                                                    title="Nueva Nota Final"><b>{{ $nota_final_baja }}</b></span>
+                                                                <br>
                                                             @else
-                                                                {{$insc->notas->final_nota}}
+                                                                {{ $insc->notas->final_nota }}
                                                             @endif
                                                         </td>
-                                                        <td align="center"style="max-width: 200px;" > 
-                                                            @if ($insc->notas->observaciones_detalle === 'APROBADO' || $insc->notas->observaciones_detalle === 'REPROBADO' || $insc->notas->observaciones_detalle === 'NO SE PRESENTÓ')
-                                                                <span class="badge {{$insc->notas->observacion_nota === 'APROBADO' ? 'bg-success' : 'bg-danger'}}">{{$insc->notas->observacion_nota}}</span> 
-                                     
-                                                            @elseif($insc->notas->observacion_nota=='BAJA')
+                                                        <td align="center"style="max-width: 200px;">
+                                                            @if (
+                                                                $insc->notas->observaciones_detalle === 'APROBADO' ||
+                                                                    $insc->notas->observaciones_detalle === 'REPROBADO' ||
+                                                                    $insc->notas->observaciones_detalle === 'NO SE PRESENTÓ')
+                                                                <span
+                                                                    class="badge {{ $insc->notas->observacion_nota === 'APROBADO' ? 'bg-success' : 'bg-danger' }}">{{ $insc->notas->observacion_nota }}</span>
+                                                            @elseif($insc->notas->observacion_nota == 'BAJA')
                                                                 {{-- <span class="badge {{$insc->notas->observacion_nota === 'APROBADO' ? 'bg-success' : 'bg-danger'}}">{{$insc->notas->observacion_nota}}</span>  --}}
-                                                                <span class="badge bg-secondary text-white" title="Observación">{{$insc->notas->observacion_nota}}</span>  <br>
-                                                                <span class="badge bg-secondary d-block text-wrap text-break" title="Detalles"><small>{{$insc->notas->observaciones_detalle}}</small></span> 
+                                                                <span class="badge bg-secondary text-white"
+                                                                    title="Observación">{{ $insc->notas->observacion_nota }}</span>
+                                                                <br>
+                                                                <span
+                                                                    class="badge bg-secondary d-block text-wrap text-break"
+                                                                    title="Detalles"><small>{{ $insc->notas->observaciones_detalle }}</small></span>
                                                             @else
-                                                            	<span class="badge bg-info text-white" title="Observación">{{$insc->notas->observacion_nota}}</span> <br>
-                                                            	<span class="badge bg-info d-block text-wrap text-break" title="Detalles"><small>{{$insc->notas->observaciones_detalle}}</small></span> 
+                                                                <span class="badge bg-info text-white"
+                                                                    title="Observación">{{ $insc->notas->observacion_nota }}</span>
+                                                                <br>
+                                                                <span
+                                                                    class="badge bg-info d-block text-wrap text-break"
+                                                                    title="Detalles"><small>{{ $insc->notas->observaciones_detalle }}</small></span>
                                                             @endif
 
-                                                            {{--@if ($editingNotaId === $insc->id_inscripcion)
+                                                            {{-- @if ($editingNotaId === $insc->id_inscripcion)
                                                                 <input wire:model="editedNotaObs" type="text" class="form-control">
                                                                 @error('editedNota')
                                                                     <span class="text-danger">{{ $message }}</span>
                                                                 @enderror
-                                                            @else--}}
-                                                            @if(!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota==$insc->notas->id_nota)
-                                                                <input wire:model="observaciones_detalle_baja" value="{{$observaciones_detalle_baja}}" type="text" class="form-control border-info @error('observaciones_detalle_baja') border-danger @enderror">
-                                                                <span class="text-info" title="Nueva Observación nota"><b>{{$observacion_nota_baja}}</b></span>
+                                                            @else --}}
+                                                            @if (!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota == $insc->notas->id_nota)
+                                                                <input wire:model="observaciones_detalle_baja"
+                                                                    value="{{ $observaciones_detalle_baja }}"
+                                                                    type="text"
+                                                                    class="form-control border-info @error('observaciones_detalle_baja') border-danger @enderror">
+                                                                <span class="text-info"
+                                                                    title="Nueva Observación nota"><b>{{ $observacion_nota_baja }}</b></span>
                                                                 <ul>
                                                                     @error('nota_final_baja')
-                                                                        <li><span class="text-danger">{{ $message }}</span></li>
+                                                                        <li><span
+                                                                                class="text-danger">{{ $message }}</span>
+                                                                        </li>
                                                                     @enderror
                                                                     @error('observacion_nota_baja')
-                                                                        <li><span class="text-danger">{{ $message }}</span></li>
+                                                                        <li><span
+                                                                                class="text-danger">{{ $message }}</span>
+                                                                        </li>
                                                                     @enderror
                                                                     @error('observaciones_detalle_baja')
-                                                                        <li><span class="text-danger">{{ $message }}</span></li>
+                                                                        <li><span
+                                                                                class="text-danger">{{ $message }}</span>
+                                                                        </li>
                                                                     @enderror
                                                                 </ul>
                                                             @endif
-                                                            
-                                                        </td>
-                                                        <td> {{$insc->estado_inscripcion}}</td>
-                                                        <td width="200px">
-                                                        @if(Auth::user()->roles[0]->name == 'Admin' || Auth::user()->roles[0]->name == 'Kardex') 
-                                                            @if ($editingNotaId === $insc->id_inscripcion)
-                                                                <button
-                                                                    wire:click="guardar_editar_nota({{ $insc->notas->id_nota }})" title="Guardar nota"
-                                                                    class="btn btn-success"><i class="far fa-save"></i></button>
-                                                                <button
-                                                                    wire:click="cancelar_edit_nota" title="Cancelar"
-                                                                    class="btn btn-danger"><i class="bx bx-reset"></i></button>
-                                                            @elseif(!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota==$insc->notas->id_nota)
-                                                                <button
-                                                                    wire:click="guardar_baja" title="Guardar Baja"
-                                                                    class="btn btn-success"><i class="far fa-save"></i></button>
-                                                                <button
-                                                                    wire:click="cancelar_baja" title="Cancelar"
-                                                                    class="btn btn-danger"><i class="bx bx-reset"></i></button>
-                                                            @else
-                                                            <div class="btn-group row" role="group">
-                                                                <div class="col-md-12">
-                                                                    <button wire:click="startEditingNota({{$insc->notas->id_nota}})" class="btn btn-info btn-sm btn-block mb-2" title="EDITAR NOTA">
-                                                                        <i class="fas fa-edit"></i> EDITAR NOTA
-                                                                    </button>
-                                                                    <button wire:click="anularinscripcion({{$insc->id_inscripcion}})" class="btn btn-danger btn-sm btn-block mb-2" title="ANULAR INSCRIPCION">
-                                                                        <i class="far fa-times-circle"></i> ANULAR INSCRIPCION
-                                                                    </button>
-                                                                    <button wire:click="editar_asignatura({{$insc->id_inscripcion}})" class="btn btn-warning btn-sm btn-block mb-2" title="EDITAR INSCRIPCION">
-                                                                        <i class="far fa-times-circle"></i> EDITAR INSCRIPCION
-                                                                    </button>
-                                                                    @if($insc->notas->observacion_nota!=='BAJA' && $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma ==='1.1')
-                                                                    	<button wire:click="inicia_baja_nota({{$insc->notas->id_nota}})" class="btn btn-danger btn-sm btn-block " title="DAR DE BAJA">
-                                                                        	<i class="far fa-times-circle"></i> DAR DE BAJA
-                                                                    	</button>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
 
+                                                        </td>
+                                                        <td> {{ $insc->estado_inscripcion }}</td>
+                                                        <td width="200px">
+                                                            @if (Auth::user()->roles[0]->name == 'Admin' || Auth::user()->roles[0]->name == 'Kardex')
+                                                                @if ($editingNotaId === $insc->id_inscripcion)
+                                                                    <button
+                                                                        wire:click="guardar_editar_nota({{ $insc->notas->id_nota }})"
+                                                                        title="Guardar nota"
+                                                                        class="btn btn-success"><i
+                                                                            class="far fa-save"></i></button>
+                                                                    <button wire:click="cancelar_edit_nota"
+                                                                        title="Cancelar" class="btn btn-danger"><i
+                                                                            class="bx bx-reset"></i></button>
+                                                                @elseif(!is_null($nota_baja_actual) && $operation === 'dar_baja' && $nota_baja_actual->id_nota == $insc->notas->id_nota)
+                                                                    <button wire:click="guardar_baja"
+                                                                        title="Guardar Baja"
+                                                                        class="btn btn-success"><i
+                                                                            class="far fa-save"></i></button>
+                                                                    <button wire:click="cancelar_baja"
+                                                                        title="Cancelar" class="btn btn-danger"><i
+                                                                            class="bx bx-reset"></i></button>
+                                                                @else
+                                                                    <div class="btn-group row" role="group">
+                                                                        <div class="col-md-12">
+                                                                            <button
+                                                                                wire:click="startEditingNota({{ $insc->notas->id_nota }})"
+                                                                                class="btn btn-info btn-sm btn-block mb-2"
+                                                                                title="EDITAR NOTA">
+                                                                                <i class="fas fa-edit"></i> EDITAR NOTA
+                                                                            </button>
+                                                                            <button
+                                                                                wire:click="anularinscripcion({{ $insc->id_inscripcion }})"
+                                                                                class="btn btn-danger btn-sm btn-block mb-2"
+                                                                                title="ANULAR INSCRIPCION">
+                                                                                <i class="far fa-times-circle"></i>
+                                                                                ANULAR INSCRIPCION
+                                                                            </button>
+                                                                            <button
+                                                                                wire:click="editar_asignatura({{ $insc->id_inscripcion }})"
+                                                                                class="btn btn-warning btn-sm btn-block mb-2"
+                                                                                title="EDITAR INSCRIPCION">
+                                                                                <i class="far fa-times-circle"></i>
+                                                                                EDITAR INSCRIPCION
+                                                                            </button>
+                                                                            @if (
+                                                                                $insc->notas->observacion_nota !== 'BAJA' &&
+                                                                                    $insc->planificar_asignatura->siadi_asignatura->nivel_idioma->nombre_nivel_idioma === '1.1')
+                                                                                <button
+                                                                                    wire:click="inicia_baja_nota({{ $insc->notas->id_nota }})"
+                                                                                    class="btn btn-danger btn-sm btn-block "
+                                                                                    title="DAR DE BAJA">
+                                                                                    <i class="far fa-times-circle"></i>
+                                                                                    DAR DE BAJA
+                                                                                </button>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+                                                            @else
+                                                                <span class="badge bg-danger text-white"
+                                                                    title="Observación">No se permiten cambios <br> a
+                                                                    la fecha </span>
                                                             @endif
-                                                        @else
-                                                        <span class="badge bg-danger text-white" title="Observación">No se permiten cambios <br> a la fecha </span>
-                                                        @endif
-                                                         
-                                                         </td>
+
+                                                        </td>
                                                     </tr>
                                                 @endforeach
 
@@ -744,66 +834,71 @@
 
                                         </table>
                                     </div>
-                                
-                            </div>
 
-                        </div>
+                                </div>
+
+                            </div>
 
 
                             @if ($asignaturaid)
-                           <div class="row">
-                                <label class="form-label">ASIGNATURAS DISPONIBLES</label>
-                                <select class="form-select" wire:model="asignatura_edite">
-                                    <option value="">Elegir...</option>
-                                    @foreach ($asignaturas_validas as $asig)
-                                        <option value="{{$asig->id_planificar_asignatura }}"> IDIOMA:  {{$asig->nombre_idioma  }}  {{$asig->nombre_nivel_idioma}} -  PARALELO: {{$asig->nombre_paralelo  }} - TURNO: {{$asig->turno_paralelo  }} - MODALIDAD: {{$asig->nombre_convocatoria_estudiante  }} </option>
-                                    @endforeach
-                                </select>
-                                <div class="text-center">
-                                    <button class="btn btn-success" wire:click="editar_inscripcion_asignatura"> EDITAR</button>
-                                    <button class="btn btn-danger" wire:click="cancelareditarinsc">CANCELAR</button>
+                                <div class="row">
+                                    <label class="form-label">ASIGNATURAS DISPONIBLES</label>
+                                    <select class="form-select" wire:model="asignatura_edite">
+                                        <option value="">Elegir...</option>
+                                        @foreach ($asignaturas_validas as $asig)
+                                            <option value="{{ $asig->id_planificar_asignatura }}"> IDIOMA:
+                                                {{ $asig->nombre_idioma }} {{ $asig->nombre_nivel_idioma }} -
+                                                PARALELO: {{ $asig->nombre_paralelo }} - TURNO:
+                                                {{ $asig->turno_paralelo }} - MODALIDAD:
+                                                {{ $asig->nombre_convocatoria_estudiante }} </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="text-center">
+                                        <button class="btn btn-success" wire:click="editar_inscripcion_asignatura">
+                                            EDITAR</button>
+                                        <button class="btn btn-danger"
+                                            wire:click="cancelareditarinsc">CANCELAR</button>
+                                    </div>
                                 </div>
-                            </div>     
                             @endif
-                    
+
                             <div class="modal-footer d-flex justify-content-center">
-                                <button type="button" class="btn btn-danger waves-effect" wire:click="cancelar_edit_nota"
-                                    data-bs-dismiss="modal">CERRAR</button>
+                                <button type="button" class="btn btn-danger waves-effect"
+                                    wire:click="cancelar_edit_nota" data-bs-dismiss="modal">CERRAR</button>
 
                             </div>
-                    </div>
+                        </div>
                         <!-- /.modal-content -->
-                </div>
+                    </div>
                     <!-- /.modal-dialog -->
 
-            </div>
-
-@else
-                                    
-                                    
-            <div wire:ignore.self data-bs-backdrop="static" id="historialpersona" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title mt-0"></h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="col-lg-12">
-                                                        <div class="alert alert-danger" role="alert">
-                                                            <h4 class="alert-heading">Nota!</h4>
-                                                            <p>El estudiante no cuenta con un historial academico.</p>
-                                                            <hr>
-                                                            <p class="mb-0">Verifique bien los datos del estudiante.</p>
-                                                          </div>
-                                                    </div>
-                                                    </div>
-                                                </div>
-                                                <!-- /.modal-content -->
-                                            </div>
-                                            <!-- /.modal-dialog -->
-                                        </div>
-@endif
+                </div>
+            @else
+                <div wire:ignore.self data-bs-backdrop="static" id="historialpersona" class="modal fade"
+                    tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger" role="alert">
+                                        <h4 class="alert-heading">Nota!</h4>
+                                        <p>El estudiante no cuenta con un historial academico.</p>
+                                        <hr>
+                                        <p class="mb-0">Verifique bien los datos del estudiante.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+            @endif
 
 
             <div wire:ignore.self data-bs-backdrop="static" id="crearpersona" class="modal fade" tabindex="-1"
@@ -822,7 +917,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">CI:</label>
-                                        <input type="text" class="form-control @error('ci') border-danger @enderror" wire:model="ci">
+                                        <input type="text"
+                                            class="form-control @error('ci') border-danger @enderror" wire:model="ci">
                                         @error('ci')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -833,7 +929,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">EXPEDIDO:</label>
-                                        <select class="form-select @error('expedido') border-danger @enderror" wire:model="expedido">
+                                        <select class="form-select @error('expedido') border-danger @enderror"
+                                            wire:model="expedido">
                                             <option value="">Elegir...</option>
                                             @foreach ($EXPEDIDO_DATA as $expedi)
                                                 <option value="{{ $expedi }}">{{ $expedi }}
@@ -850,7 +947,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">ESTADO CIVIL:</label>
-                                        <select class="form-select @error('estado_civil') border-danger @enderror" wire:model="estado_civil">
+                                        <select class="form-select @error('estado_civil') border-danger @enderror"
+                                            wire:model="estado_civil">
                                             <option value="">Elegir...</option>
                                             @foreach ($ESTADOS_CIVILES as $est_civ)
                                                 <option value="{{ $est_civ }}">{{ $est_civ }}
@@ -866,7 +964,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">NOMBRE:</label>
-                                        <input type="text" class="form-control @error('nombre') border-danger @enderror" wire:model="nombre">
+                                        <input type="text"
+                                            class="form-control @error('nombre') border-danger @enderror"
+                                            wire:model="nombre">
                                         @error('nombre')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -876,7 +976,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">PATERNO:</label>
-                                        <input type="text" class="form-control @error('paterno') border-danger  @enderror" wire:model="paterno">
+                                        <input type="text"
+                                            class="form-control @error('paterno') border-danger  @enderror"
+                                            wire:model="paterno">
                                         @error('paterno')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -886,7 +988,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">MATERNO:</label>
-                                        <input type="text" class="form-control @error('materno') border-danger @enderror" wire:model="materno">
+                                        <input type="text"
+                                            class="form-control @error('materno') border-danger @enderror"
+                                            wire:model="materno">
                                         @error('materno')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -896,10 +1000,12 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">PAÍS:</label>
-                                        <select class="form-select @error('pais') border-danger @enderror" wire:model="pais">
+                                        <select class="form-select @error('pais') border-danger @enderror"
+                                            wire:model="pais">
                                             <option value="">Elegir...</option>
                                             @foreach ($paises as $pa)
-                                                <option value="{{ $pa->id_siadi_pais }}">{{ $pa->nombre_siadi_pais }}
+                                                <option value="{{ $pa->id_siadi_pais }}">
+                                                    {{ $pa->nombre_siadi_pais }}
                                                 </option>
                                             @endforeach
 
@@ -913,7 +1019,8 @@
                                     <div class="mb-6">
                                         <label class="form-label">GÉNERO:</label>
 
-                                        <select class="form-select @error('genero') border-danger @enderror" wire:model="genero">
+                                        <select class="form-select @error('genero') border-danger @enderror"
+                                            wire:model="genero">
                                             <option value="M">MASCULINO</option>
                                             <option value="F">FEMENINO</option>
                                         </select>
@@ -926,7 +1033,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">FECHA DE NACIMIENTO:</label>
-                                        <input type="date" class="form-control @error('fecha_nacimiento') border-danger @enderror" wire:model="fecha_nacimiento">
+                                        <input type="date"
+                                            class="form-control @error('fecha_nacimiento') border-danger @enderror"
+                                            wire:model="fecha_nacimiento">
                                         @error('fecha_nacimiento')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -937,7 +1046,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">PROFESIÓN:</label>
-                                        <input type="text" class="form-control @error('profesion') border-danger @enderror" wire:model="profesion">
+                                        <input type="text"
+                                            class="form-control @error('profesion') border-danger @enderror"
+                                            wire:model="profesion">
                                         @error('profesion')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -948,7 +1059,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">DIRECCIÓN:</label>
-                                        <input type="text" class="form-control @error('direccion') border-danger @enderror" wire:model="direccion">
+                                        <input type="text"
+                                            class="form-control @error('direccion') border-danger @enderror"
+                                            wire:model="direccion">
                                         @error('direccion')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -958,7 +1071,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">TELÉFONO:</label>
-                                        <input type="text" class="form-control @error('telefono') border-danger @enderror" wire:model="telefono">
+                                        <input type="text"
+                                            class="form-control @error('telefono') border-danger @enderror"
+                                            wire:model="telefono">
                                         @error('telefono')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -968,7 +1083,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">CELULAR:</label>
-                                        <input type="text" class="form-control @error('celular') border-danger @enderror" wire:model="celular">
+                                        <input type="text"
+                                            class="form-control @error('celular') border-danger @enderror"
+                                            wire:model="celular">
                                         @error('celular')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -978,7 +1095,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">EMAIL:</label>
-                                        <input type="text" class="form-control @error('email') border-danger @enderror" wire:model="email">
+                                        <input type="text"
+                                            class="form-control @error('email') border-danger @enderror"
+                                            wire:model="email">
                                         @error('email')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -988,7 +1107,8 @@
                                 <div class="col-md-4">
                                     <div class="mb-6">
                                         <label class="form-label">TIPO ESTUDIANTE:</label>
-                                        <select wire:model="tipo_estudiante" class="form-select @error('tipo_estudiante') border-danger @enderror"
+                                        <select wire:model="tipo_estudiante"
+                                            class="form-select @error('tipo_estudiante') border-danger @enderror"
                                             aria-label="Default select example">
                                             <option value="">Elegir...</option>
                                             @foreach ($tipo_estudiante2 as $tipo_est)
@@ -1035,7 +1155,7 @@
                     });
                 });
                 document.addEventListener('livewire:load', function() {
-                     Livewire.on('abrimodaldeguardarpersona', function() {
+                    Livewire.on('abrimodaldeguardarpersona', function() {
                         $('#crearpersona').modal('show');
                     });
                     Livewire.on('cerrarmodaldeguardarpersona', function() {

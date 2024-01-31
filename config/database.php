@@ -46,8 +46,8 @@ return [
             'host' => 'localhost',
             'port' => '3306',
             'database' => 'base_upea',
-            'username' => 'root',
-            'password' => '$i3#-*+2o2E:-)=j-+b%',
+            'username' => 'azbits',
+            'password' => '1234',
 
         ],
 
